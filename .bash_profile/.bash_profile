@@ -97,3 +97,4 @@ cleanup_mac()
 eval "$(rbenv init -)"
 export PATH="$HOME/.rbenv/bin:$PATH"
 
+eval "$(docker-machine env default)"
