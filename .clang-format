@@ -1,0 +1,10 @@
+BasedOnStyle: llvm
+BreakBeforeBraces: Allman
+KeepEmptyLinesAtTheStartOfBlocks: false
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+NamespaceIndentation: All
+IndentCaseLabels: true
