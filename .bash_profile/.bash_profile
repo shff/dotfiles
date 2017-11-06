@@ -26,6 +26,7 @@ alias count="sort | uniq -c | sort"
 alias chwat="stat -f \"%OLp\""
 alias s="/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
 alias be="bundle exec"
+alias r="env $(cat .env | xargs) bin/rails"
 
 alias wgmp3='wget -r --accept "*.mp3" -nd --level 2'
 alias flac_to_mp3="find . -name \"*.flac\" -exec ffmpeg -i \"{}\" -acodec mp3 -b:a 320k \"{}.mp3\" \\;"
