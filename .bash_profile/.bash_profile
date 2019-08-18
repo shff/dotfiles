@@ -90,64 +90,88 @@ rebase()
   git checkout -
 }
 
-cleanup_mac()
+cleanup()
 {
-  echo 'Empty the Trash on all mounted volumes and the main HDD...'
-  sudo rm -rfv ~/.Trash/* &>/dev/null
+  echo 'Cleaning up...'
 
-  echo 'Clear System Log Files...'
-  sudo rm -rfv /private/var/log/asl/*.asl &>/dev/null
-  sudo rm -rfv /Library/Logs/DiagnosticReports/* &>/dev/null
-  sudo rm -rfv /Library/Logs/Adobe/* &>/dev/null
-  rm -rfv ~/Library/Containers/com.apple.mail/Data/Library/Logs/Mail/* &>/dev/null
-  rm -rfv ~/Library/Logs/CoreSimulator/* &>/dev/null
+  echo ' - iOS Device Backups...'
+  rm -rf ~/Library/Application\ Support/MobileSync/Backup/*
 
-  echo 'Clear Adobe Cache Files...'
-  sudo rm -rfv ~/Library/Application\ Support/Adobe/Common/Media\ Cache\ Files/* &>/dev/null
+  echo ' - XCode Derived Data and Archives...'
+  rm -rf ~/Library/Developer/Xcode/DerivedData/*
+  rm -rf ~/Library/Developer/Xcode/Archives/*
 
-  echo 'Cleanup iOS Applications...'
-  rm -rfv ~/Music/iTunes/iTunes\ Media/Mobile\ Applications/* &>/dev/null
-
-  echo 'Remove iOS Device Backups...'
-  rm -rfv ~/Library/Application\ Support/MobileSync/Backup/* &>/dev/null
-
-  echo 'Cleanup XCode Derived Data and Archives...'
-  rm -rfv ~/Library/Developer/Xcode/DerivedData/* &>/dev/null
-  rm -rfv ~/Library/Developer/Xcode/Archives/* &>/dev/null
-
-  echo 'Cleanup Homebrew Cache...'
-  brew cleanup --force -s &>/dev/null
-  brew cask cleanup --force -s &>/dev/null
-  rm -rfv /Library/Caches/Homebrew/* &>/dev/null
+  echo ' - Homebrew Cache...'
+  #brew cleanup -s
+  rm -rf /Library/Caches/Homebrew/*
   rm -rf $(brew --cache)
 
-  echo 'Cleanup any old versions of gems'
-  gem cleanup &>/dev/null
+  echo ' - Old versions of gems'
+  gem cleanup
 
-  echo 'Clean yarn cache'
+  echo ' - Yarn cache'
   yarn cache clean
 
-  echo 'Cleaning user folder'
-  rm -rf ~/Library/Caches/*
-  rm -rf ~/Library/Logs/*
+  echo ' - Browser data...'
   rm -rf ~/Library/Safari/LocalStorage/http*
   rm -rf ~/Library/Safari/Databases/___IndexedDB/http*
   rm -rf ~/Library/Safari/Databases/http*
-  rm -rf ~/Library/Safari/History*
+  # rm -rf ~/Library/Safari/History*
+  rm -rf ~/Library/Google
+  rm -rf ~/Library/Application\ Support/Firefox
+  rm -rf ~/Library/Application\ Support/Google
+  # rm -rf ~/Library/Cookies/com.apple.Safari.cookies
+  # rm -rf ~/Library/Cookies/Cookies.binarycookies
+
+  echo ' - Local caches...'
+  rm -rf ~/Library/Caches/*
   rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Cache/
   rm -rf ~/Music/iTunes/Album\ Artwork/Cache/
   rm -rf ~/Library/Containers/com.apple.siri.media-indexer/
   rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Cache/
   rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Index/
-  rm -rf ~/Library/Google
-  rm -rf ~/Library/Application\ Support/Google
-  rm -rf ~/Library/Cookies/com.apple.Safari.cookies
-  rm -rf ~/Library/Cookies/Cookies.binarycookies
-  sudo find ~/Library/Containers/ -name 'Caches' | xargs rm -rf
-  sudo find ~/Library/Containers/ -name 'Logs' | xargs rm -rf
-  sudo find ~/ -name .DS_Store -delete
+  find ~/Library/Containers/ -name 'Caches' | xargs rm -rf
 
-  echo 'Purge inactive memory...'
+  echo ' - Local logs...'
+  rm -rf ~/Library/Containers/com.apple.mail/Data/Library/Logs/Mail/*
+  rm -rf ~/Library/Logs/CoreSimulator/*
+  rm -rf ~/Library/Logs/*
+  rm -rf ~/Library/Application\ Support/Firefox/Crash\ Reports/*
+  find ~/Library/Containers/ -name 'Logs' | xargs rm -rf
+
+  echo ' - Application specific temporary files...'
+  rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Backup
+  rm -rf ~/Library/Application\ Support/Pixelmator\ Pro/History
+  rm -rf ~/Library/Application\ Support/CrashReporter
+
+  echo ' - System Log Files...'
+  sudo rm -rf /private/var/log/asl/*.asl
+  sudo rm -rf /Library/Logs/DiagnosticReports/*
+  sudo rm -rf /Library/Logs/Adobe/*
+
+  echo ' - System Caches'
+  sudo rm -rf /Library/Caches/*
+  sudo rm -rf /System/Library/Caches/*
+  sudo rm -rf /Users/Shared/*
+
+  echo ' - Adobe Cache Files...'
+  sudo rm -rf ~/Library/Application\ Support/Adobe/Common/Media\ Cache\ Files/*
+
+  echo ' - Empty folders...'
+  sudo find ~/ -name .DS_Store -delete
+  sudo find ~/Library -depth -empty -delete
+
+  echo ' - Cleaning trash on all mounted volumes and the main HDD...'
+  sudo rm -rf ~/.Trash/*
+
+  echo ' - DNS Cache'
+  sudo killall -HUP mDNSResponder
+  sudo dscacheutil -flushcache
+
+  echo ' - Running periodic scripts'
+  sudo periodic daily weekly monthly
+
+  echo ' - Purge inactive memory...'
   sudo purge
 }
 
