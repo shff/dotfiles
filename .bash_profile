@@ -38,6 +38,7 @@ alias be='env $(cat .env | xargs) bundle exec'
 alias r='env $(cat .env | xargs) bin/rails'
 alias e='env $(cat .env | xargs) '
 alias l='ls -lah'
+alias x='xargs -0 -n1 -I{}'
 alias ya='youtube-dl -x --audio-format wav '
 alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d' ' -f2-"
 alias specs="be rspec \$(git diff --name-only master.. spec/ | grep _spec)"
