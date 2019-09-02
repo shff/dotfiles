@@ -96,6 +96,9 @@ cleanup()
 {
   echo 'Cleaning up...'
 
+  echo ' - Bash History and Sessions'
+  rm -rf ~/.bash_sessions .bash_history
+
   echo ' - iOS Device Backups...'
   rm -rf ~/Library/Application\ Support/MobileSync/Backup/*
 
@@ -104,9 +107,8 @@ cleanup()
   rm -rf ~/Library/Developer/Xcode/Archives/*
 
   echo ' - Homebrew Cache...'
-  #brew cleanup -s
   rm -rf /Library/Caches/Homebrew/*
-  rm -rf $(brew --cache)
+  rm -rf ~/Library/Caches/Homebrew/*
 
   echo ' - Old versions of gems'
   gem cleanup
@@ -118,10 +120,10 @@ cleanup()
   rm -rf ~/Library/Safari/LocalStorage/http*
   rm -rf ~/Library/Safari/Databases/___IndexedDB/http*
   rm -rf ~/Library/Safari/Databases/http*
-  # rm -rf ~/Library/Safari/History*
   rm -rf ~/Library/Google
   rm -rf ~/Library/Application\ Support/Firefox
   rm -rf ~/Library/Application\ Support/Google
+  # rm -rf ~/Library/Safari/History*
   # rm -rf ~/Library/Cookies/com.apple.Safari.cookies
   # rm -rf ~/Library/Cookies/Cookies.binarycookies
 
@@ -153,7 +155,7 @@ cleanup()
 
   echo ' - System Caches'
   sudo rm -rf /Library/Caches/*
-  sudo rm -rf /System/Library/Caches/*
+  sudo rm -rf /System/Library/Caches/* &> /dev/null
   sudo rm -rf /Users/Shared/*
 
   echo ' - Adobe Cache Files...'
