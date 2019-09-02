@@ -43,6 +43,10 @@ alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d
 alias specs="be rspec \$(git diff --name-only master.. spec/ | grep _spec)"
 alias remigrate="git diff --name-only master.. db/migrate | tail -r | cut -d'/' -f3- | cut -d'_' -f1 | xargs -n1 -I {} env \$(cat .env | xargs) bin/rails db:migrate:down VERSION={} ;  env \$(cat .env | xargs) bin/rails db:migrate"
 
+m() {
+  mkdir $1 && cd $1
+}
+
 mono_bundler()
 {
   NAME=$(basename "$1");
