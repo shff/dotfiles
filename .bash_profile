@@ -13,7 +13,6 @@ bind "set completion-map-case on"         # Treat hyphens and underscores as equ
 bind '"\e[A": history-search-backward'    # Prefix history search up
 bind '"\e[B": history-search-forward'     # Prefix history search down
 
-export C_INCLUDE_PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/usr/include/:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks
 export EDITOR="nano"
 export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history"
 export HISTCONTROL="erasedups:ignoreboth"
