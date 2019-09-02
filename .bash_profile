@@ -195,11 +195,6 @@ cleanup()
 
 (find ~/ -name .DS_Store -delete &>/dev/null &)
 
-eval "$(rbenv init -)"
-
-export PATH="$HOME/.rbenv/bin:$PATH"
-export PATH="$HOME/go/bin:$PATH"
-export GPG_TTY=$(tty)
-export PKG_CONFIG_PATH=/usr/local/Cellar/openssl@1.1/1.1.0h/lib/pkgconfig
+export NODE_PATH=/usr/local/lib/node_modules
 
 . $(brew --prefix)/etc/bash_completion
