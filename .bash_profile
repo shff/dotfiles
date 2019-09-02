@@ -83,6 +83,10 @@ cep()
   curl -s "https://viacep.com.br/ws/$(echo $1 | tr -dc '0-9')/json/" | jq -r '.logradouro, .bairro, .localidade, .uf'
 }
 
+getsub() {
+  curl -H "User-Agent: SubDB/1.0 (One-line Bash script)" "http://api.thesubdb.com/?action=download&language=en%2Cpt&hash=$((head -c 65536 "$1"; tail -c 65536 "$1") | md5)" > "${1%%.*}.srt"
+}
+
 rebase()
 {
   git checkout $1
@@ -90,6 +94,16 @@ rebase()
   git rebase --abort
   git push -f
   git checkout -
+}
+
+restore_db() {
+  database=$1 psql <<EOF
+SELECT PG_TERMINATE_BACKEND(pid) FROM pg_stat_activity WHERE pid <> PG_BACKEND_PID() AND datname = '$database';
+DROP DATABASE IF EXISTS "$database";
+CREATE DATABASE "$database";
+EOF
+
+  pg_restore -d $1 --no-acl --no-owner $2
 }
 
 cleanup()
@@ -177,20 +191,6 @@ cleanup()
 
   echo ' - Purge inactive memory...'
   sudo purge
-}
-
-restore_db() {
-  database=$1 psql <<EOF
-SELECT PG_TERMINATE_BACKEND(pid) FROM pg_stat_activity WHERE pid <> PG_BACKEND_PID() AND datname = '$database';
-DROP DATABASE IF EXISTS "$database";
-CREATE DATABASE "$database";
-EOF
-
-  pg_restore -d $1 --no-acl --no-owner $2
-}
-
-getsub() {
-  curl -H "User-Agent: SubDB/1.0 (One-line Bash script)" "http://api.thesubdb.com/?action=download&language=en%2Cpt&hash=$((head -c 65536 "$1"; tail -c 65536 "$1") | md5)" > "${1%%.*}.srt"
 }
 
 (find ~/ -name .DS_Store -delete &>/dev/null &)
