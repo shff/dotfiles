@@ -80,7 +80,7 @@ rhyme()
 
 cep()
 {
-  curl -s "http://viacep.com.br/ws/$(echo $1 | tr -dc '0-9')/json/" | jq -r '.logradouro, .bairro, .localidade, .uf'
+  curl -s "https://viacep.com.br/ws/$(echo $1 | tr -dc '0-9')/json/" | jq -r '.logradouro, .bairro, .localidade, .uf'
 }
 
 rebase()
