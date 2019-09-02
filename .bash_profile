@@ -10,9 +10,8 @@ shopt -s cdspell        # Correct spelling errors in arguments supplied to cd
 bind "set show-all-if-ambiguous on"       # Display matches for ambiguous patterns at first tab press
 bind "set completion-ignore-case on"      # Perform file completion in a case insensitive fashion
 bind "set completion-map-case on"         # Treat hyphens and underscores as equivalent
-bind "set show-all-if-ambiguous on"
-bind '"\e[A": history-search-backward'
-bind '"\e[B": history-search-forward'
+bind '"\e[A": history-search-backward'    # Prefix history search up
+bind '"\e[B": history-search-forward'     # Prefix history search down
 
 export C_INCLUDE_PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/usr/include/:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks
 export EDITOR="nano"
