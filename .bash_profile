@@ -197,5 +197,6 @@ cleanup()
 (find ~/ -name .DS_Store -delete &>/dev/null &)
 
 export NODE_PATH=/usr/local/lib/node_modules
+export PATH="~/.rbenv/shims:${PATH}"
 
 . $(brew --prefix)/etc/bash_completion
