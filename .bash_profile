@@ -20,7 +20,7 @@ export HISTCONTROL="erasedups:ignoreboth"
 set -o noclobber
 
 alias urls="perl -pe 's|.*(https?:\/\/.*?)\".*|\1|'"
-alias hostmaker="( head -n 10 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl http://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt http://someonewhocares.org/hosts/hosts http://hosts-file.net/download/hosts.txt \"http://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\") | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/ \+/ /' -e 's/#.*$//' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | uniq | sort -u ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
+alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\") | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/ \+/ /' -e 's/#.*$//' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | uniq | sort -u ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
 alias wback='wget -np -e robots=off --mirror --domains=staticweb.archive.org,web.archive.org '
 alias wg='wget --recursive --page-requisites --convert-links --adjust-extension --no-clobber --random-wait -e robots=off -U mozilla '
 alias wgmp3='wget -r --accept "*.mp3" -nd --level 2'
@@ -38,7 +38,7 @@ alias be='env $(cat .env | xargs) bundle exec'
 alias r='env $(cat .env | xargs) bin/rails'
 alias e='env $(cat .env | xargs) '
 alias l='ls -lah'
-alias x='xargs -0 -n1 -I{}'
+alias x='xargs -n1 -I {}'
 alias ya='youtube-dl -x --audio-format wav '
 alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d' ' -f2-"
 alias specs="be rspec \$(git diff --name-only master.. spec/ | grep _spec)"
@@ -46,12 +46,6 @@ alias remigrate="git diff --name-only master.. db/migrate | tail -r | cut -d'/' 
 
 m() {
   mkdir $1 && cd $1
-}
-
-mono_bundler()
-{
-  NAME=$(basename "$1");
-  CC="gcc -lobjc -liconv -framework CoreFoundation" mkbundle -o ${NAME%.exe} --deps --static -z $1
 }
 
 dmg()
@@ -88,6 +82,12 @@ getsub() {
   curl -H "User-Agent: SubDB/1.0 (One-line Bash script)" "http://api.thesubdb.com/?action=download&language=en%2Cpt&hash=$((head -c 65536 "$1"; tail -c 65536 "$1") | md5)" > "${1%%.*}.srt"
 }
 
+mono_bundler()
+{
+  NAME=$(basename "$1");
+  CC="gcc -lobjc -liconv -framework CoreFoundation" mkbundle -o ${NAME%.exe} --deps --static -z $1
+}
+
 rebase()
 {
   git checkout $1
@@ -111,92 +111,114 @@ cleanup()
 {
   echo 'Cleaning up...'
 
-  echo ' - Bash History and Sessions'
-  rm -rf ~/.bash_sessions .bash_history
+  echo ' - Bash History'
+  rm -rf ~/.bash_history
 
-  echo ' - iOS Device Backups...'
+  echo ' - Bash Sessions'
+  rm -rf ~/.bash_sessions
+
+  echo ' - iOS Device Backups'
   rm -rf ~/Library/Application\ Support/MobileSync/Backup/*
 
-  echo ' - XCode Derived Data and Archives...'
+  echo ' - XCode Derived Data and Archives'
   rm -rf ~/Library/Developer/Xcode/DerivedData/*
   rm -rf ~/Library/Developer/Xcode/Archives/*
 
-  echo ' - Homebrew Cache...'
+  echo ' - Homebrew Cache'
   rm -rf /Library/Caches/Homebrew/*
   rm -rf ~/Library/Caches/Homebrew/*
 
-  echo ' - Old versions of gems'
+  echo ' - Gem Cache'
   gem cleanup
 
-  echo ' - Yarn cache'
+  echo ' - Yarn Cache'
   yarn cache clean
 
-  echo ' - Browser data...'
+  echo ' - Browser data'
   rm -rf ~/Library/Safari/LocalStorage/http*
   rm -rf ~/Library/Safari/Databases/___IndexedDB/http*
   rm -rf ~/Library/Safari/Databases/http*
   rm -rf ~/Library/Google
   rm -rf ~/Library/Application\ Support/Firefox
   rm -rf ~/Library/Application\ Support/Google
+  rm -r ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2*
   # rm -rf ~/Library/Safari/History*
   # rm -rf ~/Library/Cookies/com.apple.Safari.cookies
   # rm -rf ~/Library/Cookies/Cookies.binarycookies
 
-  echo ' - Local caches...'
-  rm -rf ~/Library/Caches/*
-  rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Cache/
+  echo ' - Local caches'
+  find ~/Library/Caches/ -not -name AudioUnitCache -not -name com.apple.audiounits.cache -delete
+  find ~/Library/Containers/ -name 'Caches' | xargs rm -rf
+
+  echo ' - Application specific caches'
   rm -rf ~/Music/iTunes/Album\ Artwork/Cache/
   rm -rf ~/Library/Containers/com.apple.siri.media-indexer/
   rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Cache/
   rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Index/
-  find ~/Library/Containers/ -name 'Caches' | xargs rm -rf
 
-  echo ' - Local logs...'
-  rm -rf ~/Library/Containers/com.apple.mail/Data/Library/Logs/Mail/*
-  rm -rf ~/Library/Logs/CoreSimulator/*
+  echo ' - Local logs'
   rm -rf ~/Library/Logs/*
+  rm -rf ~/Library/Logs/CoreSimulator/*
+  rm -rf ~/Library/Containers/com.apple.mail/Data/Library/Logs/Mail/*
   rm -rf ~/Library/Application\ Support/Firefox/Crash\ Reports/*
   find ~/Library/Containers/ -name 'Logs' | xargs rm -rf
 
-  echo ' - Application specific temporary files...'
+  echo ' - Application specific temporary files'
   rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Backup
   rm -rf ~/Library/Application\ Support/Pixelmator\ Pro/History
   rm -rf ~/Library/Application\ Support/CrashReporter
 
-  echo ' - System Log Files...'
-  sudo rm -rf /private/var/log/asl/*.asl
-  sudo rm -rf /Library/Logs/DiagnosticReports/*
-  sudo rm -rf /Library/Logs/Adobe/*
-
-  echo ' - System Caches'
-  sudo rm -rf /Library/Caches/*
-  sudo rm -rf /System/Library/Caches/* &> /dev/null
-  sudo rm -rf /Users/Shared/*
-
-  echo ' - Adobe Cache Files...'
-  sudo rm -rf ~/Library/Application\ Support/Adobe/Common/Media\ Cache\ Files/*
-
-  echo ' - Empty folders...'
+  echo ' - Remove empty folders'
   sudo find ~/ -name .DS_Store -delete
   sudo find ~/Library -depth -empty -delete
 
-  echo ' - Cleaning trash on all mounted volumes and the main HDD...'
+  echo ' - Clean trash on all volumes'
   sudo rm -rf ~/.Trash/*
 
-  echo ' - DNS Cache'
+  echo ' - System Log Files'
+  sudo rm -rf /Library/Logs/DiagnosticReports/*
+  sudo rm -rf /Library/Logs/CrashReporter/*
+  sudo rm -rf /Library/Logs/Adobe/*
+  sudo rm -rf /var/log/asl/*.asl
+  sudo rm -rf /var/log/wifi.log*
+  sudo rm -rf /var/log/system.log*
+  sudo rm -rf /var/log/install.log*
+  sudo rm -rf /var/log/*.out
+  sudo rm -rf /var/log/fsck*
+
+  echo ' - Shared user data'
+  sudo rm -rf /Users/Shared/*
+
+  echo ' - System Caches'
+  sudo rm -rf /Library/Caches/*
+  # sudo rm -rf /System/Library/Caches/* &> /dev/null
+
+  echo ' - System diagnostics'
+  sudo rm -rf /var/db/diagnostics/*
+  sudo rm -rf /private/var/log/DiagnosticMessages/*
+
+  echo ' - Adobe Cache Files'
+  sudo rm -rf ~/Library/Application\ Support/Adobe/Common/Media\ Cache\ Files/*
+
+  echo ' - Run periodic scripts'
+  sudo periodic daily weekly monthly
+
+  echo ' - User temp and cache dirs'
+  find $(getconf DARWIN_USER_CACHE_DIR) -delete
+  find $(getconf DARWIN_USER_TEMP_DIR) -delete
+
+  echo ' - Clear DNS Cache'
   sudo killall -HUP mDNSResponder
   sudo dscacheutil -flushcache
 
-  echo ' - Running periodic scripts'
-  sudo periodic daily weekly monthly
-
-  echo ' - Purge inactive memory...'
+  echo ' - Purge inactive memory'
   sudo purge
 }
 
 (find ~/ -name .DS_Store -delete &>/dev/null &)
 
 export NODE_PATH=/usr/local/lib/node_modules
-export PATH="~/.rbenv/shims:${PATH}"
+export TZ=Brazil
 
-. $(brew --prefix)/etc/bash_completion
+# (rbenv rehash &)
+# export PATH="~/.rbenv/shims:${PATH}"
