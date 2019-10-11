@@ -20,7 +20,7 @@ export HISTCONTROL="erasedups:ignoreboth"
 set -o noclobber
 
 alias urls="perl -pe 's|.*(https?:\/\/.*?)\".*|\1|'"
-alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\") | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/ \+/ /' -e 's/#.*$//' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | uniq | sort -u ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
+alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\") | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
 alias wback='wget -np -e robots=off --mirror --domains=staticweb.archive.org,web.archive.org '
 alias wg='wget --recursive --page-requisites --convert-links --adjust-extension --no-clobber --random-wait -e robots=off -U mozilla '
 alias wgmp3='wget -r --accept "*.mp3" -nd --level 2'
