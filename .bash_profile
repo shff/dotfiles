@@ -41,6 +41,7 @@ alias e='env $(cat .env | xargs) '
 alias l='ls -lah'
 alias x='xargs -n1 -I {}'
 alias ya='youtube-dl -x --audio-format wav '
+alias ya3='youtube-dl -x --audio-format mp3 '
 alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d' ' -f2-"
 alias specs="be rspec \$(git diff --name-only master.. spec/ | grep _spec)"
 alias remigrate="git diff --name-only master.. db/migrate | tail -r | cut -d'/' -f3- | cut -d'_' -f1 | xargs -n1 -I {} env \$(cat .env | xargs) bin/rails db:migrate:down VERSION={} ;  env \$(cat .env | xargs) bin/rails db:migrate"
