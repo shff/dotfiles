@@ -205,8 +205,8 @@ cleanup()
   sudo periodic daily weekly monthly
 
   echo ' - User temp and cache dirs'
-  find $(getconf DARWIN_USER_CACHE_DIR) -delete
-  find $(getconf DARWIN_USER_TEMP_DIR) -delete
+  # find $(getconf DARWIN_USER_CACHE_DIR) -delete
+  # find $(getconf DARWIN_USER_TEMP_DIR) -delete
 
   echo ' - Clear DNS Cache'
   sudo killall -HUP mDNSResponder
