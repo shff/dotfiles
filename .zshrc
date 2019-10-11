@@ -1,17 +1,12 @@
 source /Library/Developer/CommandLineTools/usr/share/git-core/git-prompt.sh
 
+setopt PROMPT_SUBST
 PS1="\$(__git_ps1 '[%s]')🦊 "
 
-shopt -s checkwinsize   # Update window size after every command
-shopt -s histappend     # Append to the history file, don't overwrite it
-shopt -s cmdhist        # Save multi-line commands as one command
-shopt -s cdspell        # Correct spelling errors in arguments supplied to cd
-
-bind "set show-all-if-ambiguous on"       # Display matches for ambiguous patterns at first tab press
-bind "set completion-ignore-case on"      # Perform file completion in a case insensitive fashion
-bind "set completion-map-case on"         # Treat hyphens and underscores as equivalent
-bind '"\e[A": history-search-backward'    # Prefix history search up
-bind '"\e[B": history-search-forward'     # Prefix history search down
+autoload -Uz compinit && compinit
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+bindkey "^[[A" history-search-backward       # Prefix history search down
+bindkey "^[[B" history-search-forward        # Prefix history search up
 
 export EDITOR="nano"
 export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history"
