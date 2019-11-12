@@ -29,20 +29,25 @@ alias ogg_to_mp3="find . -name \"*.ogg\" -exec ffmpeg -i \"{}\" -acodec mp3 -b:a
 alias add_cover_art="eyeD3 --add-image cover.jpg:FRONT_COVER *.mp3"
 alias chwat="stat -f \"%OLp\""
 alias s="/Applications/Instalados/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
-alias be='env $(cat .env | xargs) bundle exec'
-alias r='env $(cat .env | xargs) bin/rails'
-alias e='env $(cat .env | xargs) '
 alias l='ls -lah'
 alias ya='youtube-dl -x --audio-format wav '
 alias ya3='youtube-dl -x --audio-format mp3 '
 alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d' ' -f2-"
+alias map='xargs -n1 -I $'
+alias mapc="cut -d, -f"
+alias count="sort | uniq -c | sort"
+
+# Ruby stuff
+alias be='env $(cat .env | xargs) bundle exec'
+alias r='env $(cat .env | xargs) bin/rails'
+alias e='env $(cat .env | xargs) '
 alias specs="be rspec \$(git diff --name-only master.. spec/ | grep _spec)"
 alias remigrate="git diff --name-only master.. db/migrate | tail -r | cut -d'/' -f3- | cut -d'_' -f1 | xargs -n1 -I {} env \$(cat .env | xargs) bin/rails db:migrate:down VERSION={} ;  env \$(cat .env | xargs) bin/rails db:migrate"
 
-# Map Reduce
-alias map='xargs -n1 -I $'
-alias count="sort | uniq -c | sort"
-filter() { while read it; do if $(eval $1); then echo $it; fi; done }     # Example: `ls | filter '[ "$l" = "Desktop" ]'`
+filter() {
+  # Example: `ls | filter '[ "$l" = "Desktop" ]'`
+  while read it; do if $(eval $1); then echo $it; fi; done
+}
 
 m() {
   mkdir $1 && cd $1
