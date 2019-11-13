@@ -1,6 +1,7 @@
 source /Library/Developer/CommandLineTools/usr/share/git-core/git-prompt.sh
 
 setopt PROMPT_SUBST
+setopt +o nomatch
 PS1="\$(__git_ps1 '[%s]')🦊 "
 
 autoload -Uz compinit && compinit
@@ -15,11 +16,12 @@ export HISTCONTROL="erasedups:ignoreboth"
 set -o noclobber
 
 alias urls="perl -pe 's|.*(https?:\/\/.*?)\".*|\1|'"
-alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\") | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
+alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\" https://raw.githubusercontent.com/shff/hosts/master/hosts) | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/  / /' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
 alias wback='wget -np -e robots=off --mirror --domains=staticweb.archive.org,web.archive.org '
 alias wg='wget --recursive --page-requisites --convert-links --adjust-extension --no-clobber --random-wait -e robots=off -U mozilla '
 alias wgmp3='wget -r --accept "*.mp3" -nd --level 2'
 alias flac_to_mp3="find . -name \"*.flac\" -exec ffmpeg -i \"{}\" -acodec mp3 -b:a 320k \"{}.mp3\" \\;"
+alias flac_to_alac="find . -name \"*.flac\" -exec ffmpeg -i \"{}\" -acodec alac -b:a 320k \"{}.m4a\" \\;"
 alias wav_to_mp3="find . -name \"*.wav\" -exec ffmpeg -i \"{}\" -acodec mp3 -b:a 320k \"{}.mp3\" \\;"
 alias wma_to_mp3="find . -name \"*.wma\" -exec ffmpeg -i \"{}\" -acodec mp3 -b:a 320k \"{}.mp3\" \\;"
 alias flac_to_wav="find . -name \"*.flac\" -exec ffmpeg -i \"{}\" \"{}.wav\" \\;"
@@ -29,25 +31,20 @@ alias ogg_to_mp3="find . -name \"*.ogg\" -exec ffmpeg -i \"{}\" -acodec mp3 -b:a
 alias add_cover_art="eyeD3 --add-image cover.jpg:FRONT_COVER *.mp3"
 alias chwat="stat -f \"%OLp\""
 alias s="/Applications/Instalados/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
+alias be='env $(cat .env | xargs) bundle exec'
+alias r='env $(cat .env | xargs) bin/rails'
+alias e='env $(cat .env | xargs) '
 alias l='ls -lah'
 alias ya='youtube-dl -x --audio-format wav '
 alias ya3='youtube-dl -x --audio-format mp3 '
 alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d' ' -f2-"
-alias map='xargs -n1 -I $'
-alias mapc="cut -d, -f"
-alias count="sort | uniq -c | sort"
-
-# Ruby stuff
-alias be='env $(cat .env | xargs) bundle exec'
-alias r='env $(cat .env | xargs) bin/rails'
-alias e='env $(cat .env | xargs) '
 alias specs="be rspec \$(git diff --name-only master.. spec/ | grep _spec)"
 alias remigrate="git diff --name-only master.. db/migrate | tail -r | cut -d'/' -f3- | cut -d'_' -f1 | xargs -n1 -I {} env \$(cat .env | xargs) bin/rails db:migrate:down VERSION={} ;  env \$(cat .env | xargs) bin/rails db:migrate"
 
-filter() {
-  # Example: `ls | filter '[ "$l" = "Desktop" ]'`
-  while read it; do if $(eval $1); then echo $it; fi; done
-}
+# Map Reduce
+alias map='xargs -n1 -I $'
+alias count="sort | uniq -c | sort"
+filter() { while read it; do if $(eval $1); then echo $it; fi; done }     # Example: `ls | filter '[ "$l" = "Desktop" ]'`
 
 m() {
   mkdir $1 && cd $1
@@ -122,22 +119,16 @@ cleanup()
   echo ' - Bash Sessions'
   rm -rf ~/.bash_sessions
 
-  echo ' - iOS Device Backups'
-  rm -rf ~/Library/Application\ Support/MobileSync/Backup/*
-
-  echo ' - XCode Derived Data and Archives'
-  rm -rf ~/Library/Developer/Xcode/DerivedData/*
-  rm -rf ~/Library/Developer/Xcode/Archives/*
-
-  echo ' - Homebrew Cache'
-  rm -rf /Library/Caches/Homebrew/*
-  rm -rf ~/Library/Caches/Homebrew/*
-
   echo ' - Gem Cache'
-  gem cleanup
+  gem cleanup > /dev/null
 
   echo ' - Yarn Cache'
-  yarn cache clean
+  yarn cache clean > /dev/null
+
+  echo ' - NPM Cache and Logs'
+  rm -rf ~/.npm
+  rm -f ~/.node_repl_history
+  rm -f ~/.config/configstore/update-notifier-npm.json
 
   echo ' - Browser data'
   rm -rf ~/Library/Safari/LocalStorage/http*
@@ -146,7 +137,7 @@ cleanup()
   rm -rf ~/Library/Google
   rm -rf ~/Library/Application\ Support/Firefox
   rm -rf ~/Library/Application\ Support/Google
-  rm -r ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2*
+  rm -rf ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2*
   # rm -rf ~/Library/Safari/History*
   # rm -rf ~/Library/Cookies/com.apple.Safari.cookies
   # rm -rf ~/Library/Cookies/Cookies.binarycookies
@@ -161,11 +152,22 @@ cleanup()
   rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Cache/
   rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Index/
 
+  echo ' - iOS Device Backups'
+  rm -rf ~/Library/Application\ Support/MobileSync/Backup/
+
+  echo ' - XCode Derived Data and Archives'
+  rm -rf ~/Library/Developer/Xcode/DerivedData/
+  rm -rf ~/Library/Developer/Xcode/Archives/
+
+  echo ' - Homebrew Cache'
+  rm -rf /Library/Caches/Homebrew/
+  rm -rf ~/Library/Caches/Homebrew/
+
   echo ' - Local logs'
-  rm -rf ~/Library/Logs/*
-  rm -rf ~/Library/Logs/CoreSimulator/*
-  rm -rf ~/Library/Containers/com.apple.mail/Data/Library/Logs/Mail/*
-  rm -rf ~/Library/Application\ Support/Firefox/Crash\ Reports/*
+  rm -rf ~/Library/Logs/
+  rm -rf ~/Library/Logs/CoreSimulator/
+  rm -rf ~/Library/Containers/com.apple.mail/Data/Library/Logs/Mail/
+  rm -rf ~/Library/Application\ Support/Firefox/Crash\ Reports/
   find ~/Library/Containers/ -name 'Logs' | xargs rm -rf
 
   echo ' - Application specific temporary files'
@@ -192,7 +194,7 @@ cleanup()
   sudo rm -rf /var/log/fsck*
 
   echo ' - Shared user data'
-  sudo rm -rf /Users/Shared/*
+  sudo rm -rf /Users/Shared/* &> /dev/null
 
   echo ' - System Caches'
   sudo rm -rf /Library/Caches/*
