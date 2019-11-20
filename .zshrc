@@ -2,7 +2,10 @@ source /Library/Developer/CommandLineTools/usr/share/git-core/git-prompt.sh
 
 setopt PROMPT_SUBST
 setopt +o nomatch
-PS1="\$(__git_ps1 '[%s]')🦊 "
+
+EMOJIS=🦊🐻🐯🦁🐨🐼🐰🐹🐱🐮
+EMOJI=${EMOJIS:$(( RANDOM % ${#EMOJIS} )):1}
+PS1="\$(__git_ps1 '[%s]')$EMOJI "
 
 autoload -Uz compinit && compinit
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
