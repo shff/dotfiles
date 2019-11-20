@@ -38,6 +38,7 @@ alias be='env $(cat .env | xargs) bundle exec'
 alias r='env $(cat .env | xargs) bin/rails'
 alias e='env $(cat .env | xargs) '
 alias l='ls -lah'
+alias f='find . -name'
 alias ya='youtube-dl -x --audio-format wav '
 alias ya3='youtube-dl -x --audio-format mp3 '
 alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d' ' -f2-"
