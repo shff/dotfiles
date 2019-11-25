@@ -18,6 +18,10 @@ export HISTCONTROL="erasedups:ignoreboth"
 
 set -o noclobber
 
+git config --global core.excludesfile '~/.gitignore'
+git config --global --unset alias.l
+git config --global alias.l 'log --pretty=oneline'
+
 alias urls="perl -pe 's|.*(https?:\/\/.*?)\".*|\1|'"
 alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\" https://raw.githubusercontent.com/shff/hosts/master/hosts) | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/  / /' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
 alias wback='wget -np -e robots=off --mirror --domains=staticweb.archive.org,web.archive.org '
