@@ -21,12 +21,14 @@ set -o noclobber
 git config --global user.name "Silvio Henrique Ferreira"
 git config --global user.email "shferreira@me.com"
 git config --global core.excludesfile '~/.gitignore'
-git config --global --replace alias.l 'log --pretty=oneline'
+git config --global --replace alias.l "log --pretty=format:'%Cred%h%Creset %s %Cgreen(%cr) %C(yellow)<%ae>%Creset' --abbrev-commit"
 git config --global --replace alias.ca 'commit --amend'
-git config --global --replace alias.pron 'pull --rebase origin master'
+git config --global --replace alias.prom 'pull --rebase origin master'
 git config --global --replace alias.rir 'rebase -i --root'
 git config --global --replace alias.ra 'rebase --abort'
 git config --global --replace alias.rc 'rebase --continue'
+git config --global --replace alias.c 'commit -am'
+git config --global --replace alias.wip 'commit -am "[WIP]"'
 
 alias urls="perl -pe 's|.*(https?:\/\/.*?)\".*|\1|'"
 alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\" https://raw.githubusercontent.com/shff/hosts/master/hosts) | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/  / /' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
