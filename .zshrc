@@ -248,3 +248,5 @@ export TZ=Brazil
 
 # (rbenv rehash &)
 # export PATH="~/.rbenv/shims:${PATH}"
+
+export PATH=~/.cargo/bin:${PATH}
