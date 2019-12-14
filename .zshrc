@@ -9,8 +9,8 @@ PS1="\$(__git_ps1 '[%s]')$EMOJI "
 
 autoload -Uz compinit && compinit
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
-bindkey "^[[A" history-search-backward       # Prefix history search down
-bindkey "^[[B" history-search-forward        # Prefix history search up
+bindkey "^[[A" history-beginning-search-backward  # Prefix history search down
+bindkey "^[[B" history-beginning-search-forward   # Prefix history search up
 
 export EDITOR="nano"
 export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history"
