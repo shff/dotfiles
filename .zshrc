@@ -104,6 +104,10 @@ alias gstl='git stash list'
 alias gstp='git stash pop'
 alias gsts='git stash save'
 
+g() {
+  grep -R $1 .
+}
+
 m() {
   mkdir $1 && cd $1
 }
