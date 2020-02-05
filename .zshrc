@@ -23,7 +23,7 @@ git config --global user.email "shferreira@me.com"
 git config --global core.excludesfile '~/.gitignore'
 git config --global --replace alias.l "log"
 git config --global --replace alias.s "show"
-git config --global --replace alias.ca 'commit --amend'
+git config --global --replace alias.ca 'commit --amend --no-edit'
 git config --global --replace alias.prom 'pull --rebase origin master'
 git config --global --replace alias.rir 'rebase -i --root'
 git config --global --replace alias.ra 'rebase --abort'
@@ -103,6 +103,7 @@ alias gstd='git stash drop'
 alias gstl='git stash list'
 alias gstp='git stash pop'
 alias gsts='git stash save'
+alias gwip='git commit -am "[WIP]"'
 
 g() {
   grep -R $1 .
@@ -192,6 +193,15 @@ cleanup()
   rm -f ~/.node_repl_history
   rm -f ~/.config/configstore/update-notifier-npm.json
 
+  echo ' - Cargo Cache'
+  rm -rf ~/.cargo/registry
+  rm -rf ~/.cargo/git
+
+  echo ' - Language temp files'
+  rm ~/.v8flags*
+  rm ~/.babel.json
+  rm ~/.python_history
+
   echo ' - Browser data'
   rm -rf ~/Library/Safari/LocalStorage/http*
   rm -rf ~/Library/Safari/Databases/___IndexedDB/http*
@@ -205,8 +215,9 @@ cleanup()
   # rm -rf ~/Library/Cookies/Cookies.binarycookies
 
   echo ' - Local caches'
-  find ~/Library/Caches/ -not -name AudioUnitCache -not -name com.apple.audiounits.cache -delete
-  find ~/Library/Containers/ -name 'Caches' | xargs rm -rf
+  rm -r ~/.cache
+  find ~/Library/Caches/ -not -name AudioUnitCache -not -name com.apple.audiounits.cache -delete 2> /dev/null
+  find ~/Library/Containers/ -name 'Caches' 2> /dev/null | xargs rm -rf
 
   echo ' - Application specific caches'
   rm -rf ~/Music/iTunes/Album\ Artwork/Cache/
@@ -230,7 +241,7 @@ cleanup()
   rm -rf ~/Library/Logs/CoreSimulator/
   rm -rf ~/Library/Containers/com.apple.mail/Data/Library/Logs/Mail/
   rm -rf ~/Library/Application\ Support/Firefox/Crash\ Reports/
-  find ~/Library/Containers/ -name 'Logs' | xargs rm -rf
+  find ~/Library/Containers/ -name 'Logs' 2> /dev/null | xargs rm -rf
 
   echo ' - Application specific temporary files'
   rm -rf ~/Library/Application\ Support/Sublime\ Text\ 3/Backup
@@ -238,8 +249,8 @@ cleanup()
   rm -rf ~/Library/Application\ Support/CrashReporter
 
   echo ' - Remove empty folders'
-  sudo find ~/ -name .DS_Store -delete
-  sudo find ~/Library -depth -empty -delete
+  sudo find ~/ -name .DS_Store -delete 2> /dev/null
+  sudo find ~/Library -depth -empty -delete 2> /dev/null
 
   echo ' - Clean trash on all volumes'
   sudo rm -rf ~/.Trash/*
