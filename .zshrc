@@ -3,14 +3,17 @@ source /Library/Developer/CommandLineTools/usr/share/git-core/git-prompt.sh
 setopt PROMPT_SUBST
 setopt +o nomatch
 
-EMOJIS=🦊🐻🐯🦁🐨🐼🐰🐹🐱🐮
-EMOJI=${EMOJIS:$(( RANDOM % ${#EMOJIS} )):1}
-PS1="\$(__git_ps1 '[%s]')$EMOJI "
+PS1="\$(__git_ps1 '[%s]')🦊 "
 
 autoload -Uz compinit && compinit
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 bindkey "^[[A" history-beginning-search-backward  # Prefix history search down
 bindkey "^[[B" history-beginning-search-forward   # Prefix history search up
+
+# Edit command line
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
 
 export EDITOR="nano"
 export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history"
