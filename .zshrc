@@ -338,11 +338,9 @@ cleanup()
 
 (find ~/ -name .DS_Store -delete &>/dev/null &)
 
+# Node
 export NODE_PATH=/usr/local/lib/node_modules
 export TZ=Brazil
-
-# (rbenv rehash &)
-# export PATH="~/.rbenv/shims:${PATH}"
 
 # Rust
 export PATH=~/.cargo/bin:${PATH}
