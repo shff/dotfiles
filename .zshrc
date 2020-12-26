@@ -37,7 +37,7 @@ git config --global format.pretty "format:%Cred%h%Creset %s %Cgreen(%cr) %C(yell
 [ -x "$(command -v diff-so-fancy)" ] && git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
 
 alias urls="perl -pe 's|.*(https?:\/\/.*?)\".*|\1|'"
-alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\" https://raw.githubusercontent.com/shff/hosts/master/hosts) | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/  / /' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
+alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\" https://raw.githubusercontent.com/EnergizedProtection/mirror/master/converter/filter/fanboy-cookiemonster.txt https://raw.githubusercontent.com/EnergizedProtection/mirror/2d87761a9e47266e7e7b267dc715fc14f67d205b/converter/filter/easyprivacy.txt https://raw.githubusercontent.com/shff/hosts/master/hosts) | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/  / /' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
 alias wback='wget -np -e robots=off --mirror --domains=staticweb.archive.org,web.archive.org '
 alias wg='wget --recursive --page-requisites --convert-links --adjust-extension --no-clobber --random-wait -e robots=off -U mozilla '
 alias wgmp3='wget -r --accept "*.mp3" -nd --level 2'
@@ -72,10 +72,12 @@ filter() { while read it; do if $(eval $1); then echo $it; fi; done }     # Exam
 alias ga='git add'
 alias gaa='git add .'
 alias gaaa='git add --all'
+alias gap='git add . -p'
 alias gau='git add --update'
 alias gb='git branch'
 alias gbd='git branch --delete '
 alias gc='git commit'
+alias gca='git commit --amend'
 alias gcm='git commit --message'
 alias gcf='git commit --fixup'
 alias gco='git checkout'
@@ -95,8 +97,10 @@ alias gmc='git merge --continue'
 alias gp='git pull'
 alias gpr='git pull --rebase'
 alias gprom='git pull --rebase origin master'
+alias gprop='git pull --rebase origin develop'
 alias gr='git rebase'
 alias grim='git rebase -i origin/master'
+alias grid='git rebase -i origin/develop'
 alias gra='git rebase --abort'
 alias gs='git status'
 alias gss='git status --short'
@@ -106,6 +110,7 @@ alias gstd='git stash drop'
 alias gstl='git stash list'
 alias gstp='git stash pop'
 alias gsts='git stash save'
+alias gsui='git submodule update --init'
 alias gwip='git commit -am "[WIP]"'
 
 g() {
@@ -306,4 +311,14 @@ export TZ=Brazil
 # (rbenv rehash &)
 # export PATH="~/.rbenv/shims:${PATH}"
 
+# Rust
 export PATH=~/.cargo/bin:${PATH}
+
+# rbenv
+[ -x "$(command -v rbenv)" ] && (rbenv rehash &)
+export PATH="~/.rbenv/shims:${PATH}"
+
+(find ~/ -name .DS_Store -delete &>/dev/null &)
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
