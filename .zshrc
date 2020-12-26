@@ -180,6 +180,39 @@ EOF
   pg_restore -d $1 --no-acl --no-owner $2
 }
 
+simulator() {
+  TMP_APP_DIR=$TMPDIR/tmp_app
+  APP_DIR=$TMP_APP_DIR/Application.app
+  PLIST_PATH=$APP_DIR/Info.plist
+
+  rm -r $TMP_APP_DIR
+  mkdir $TMP_APP_DIR
+  mkdir $APP_DIR
+  cp $1 $APP_DIR/main
+
+  echo '<plist><dict /></plist>' > $PLIST_PATH
+  plutil -insert CFBundleDevelopmentRegion -string "en" $PLIST_PATH
+  plutil -insert CFBundleDisplayName -string "Temp App" $PLIST_PATH
+  plutil -insert CFBundleExecutable -string "main" $PLIST_PATH
+  plutil -insert CFBundleIdentifier -string "io.github.shff.TempApp" $PLIST_PATH
+  plutil -insert CFBundleInfoDictionaryVersion -string "6.0" $PLIST_PATH
+  plutil -insert CFBundleName -string "Temp App" $PLIST_PATH
+  plutil -insert CFBundlePackageType -string "APPL" $PLIST_PATH
+  plutil -insert CFBundleShortVersionString -string "1.0.0" $PLIST_PATH
+  plutil -insert CFBundleSignature -string "????" $PLIST_PATH
+  plutil -insert CFBundleVersion -string "1" $PLIST_PATH
+  plutil -insert LSRequiresIPhoneOS -bool "true" $PLIST_PATH
+  plutil -insert UISupportedInterfaceOrientations -xml '<array/>' $PLIST_PATH
+  plutil -insert UISupportedInterfaceOrientations.0 -string UIInterfaceOrientationPortrait $PLIST_PATH
+  plutil -insert UISupportedInterfaceOrientations.1 -string UIInterfaceOrientationPortraitUpsideDown $PLIST_PATH
+  plutil -insert UISupportedInterfaceOrientations.2 -string UIInterfaceOrientationLandscapeLeft $PLIST_PATH
+  plutil -insert UISupportedInterfaceOrientations.3 -string UIInterfaceOrientationLandscapeRight $PLIST_PATH
+
+  SIMULATOR=$(xcrun simctl list --json | jq -r '[ .devices | values[] ] | flatten[] | select(.state == "Booted") | .name' | fzf -1)
+  xcrun simctl install $SIMULATOR "$APP_DIR"
+  xcrun simctl launch $SIMULATOR "io.github.shff.TempApp"
+}
+
 cleanup()
 {
   echo 'Cleaning up...'
