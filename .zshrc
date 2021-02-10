@@ -350,12 +350,6 @@ de2() {
   curl -s "https://api.mymemory.translated.net/get?q=$1&langpair=en|de" | jq -r '.responseData.translatedText'
 }
 
-article() {
-  BASE_URL=https://dictionary.yandex.net/api/v1/dicservice.json
-  API_KEY=dict.1.1.20210203T215939Z.2821615ab5902e4c.a85334d1d0b70dba519445e6b36f1198d0d7e811
-  curl "$BASE_URL/lookup?key=$API_KEY&lang=de-en&text=$1" | jq -r '.def[0].gen' | sed 's/f/die/; s/m/der/; s/n/das/'
-}
-
 # Node
 export NODE_PATH=/usr/local/lib/node_modules
 
