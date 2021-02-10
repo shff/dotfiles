@@ -3,6 +3,8 @@ source /Library/Developer/CommandLineTools/usr/share/git-core/git-prompt.sh
 setopt PROMPT_SUBST
 setopt +o nomatch
 
+EMOJIS=🦊🐻🐯🦁🐨🐼🐰🐹🐱🐮
+EMOJI=${EMOJIS:$(( RANDOM % ${#EMOJIS} )):1}
 PS1="\$(__git_ps1 '[%s]')🦊 "
 
 autoload -Uz compinit && compinit
@@ -24,20 +26,15 @@ set -o noclobber
 git config --global user.name "Silvio Henrique Ferreira"
 git config --global user.email "shferreira@me.com"
 git config --global core.excludesfile '~/.gitignore'
-git config --global --replace alias.l "log"
-git config --global --replace alias.s "show"
-git config --global --replace alias.ca 'commit --amend --no-edit'
-git config --global --replace alias.prom 'pull --rebase origin master'
+git config --global --replace alias.l 'log'
+git config --global --replace alias.s 'show'
 git config --global --replace alias.rir 'rebase -i --root'
-git config --global --replace alias.ra 'rebase --abort'
-git config --global --replace alias.rc 'rebase --continue'
-git config --global --replace alias.c 'commit -am'
 git config --global --replace alias.wip 'commit -am "[WIP]"'
 git config --global format.pretty "format:%Cred%h%Creset %s %Cgreen(%cr) %C(yellow)<%ae>%Creset"
 [ -x "$(command -v diff-so-fancy)" ] && git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
 
 alias urls="perl -pe 's|.*(https?:\/\/.*?)\".*|\1|'"
-alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\" https://raw.githubusercontent.com/EnergizedProtection/mirror/master/converter/filter/fanboy-cookiemonster.txt https://raw.githubusercontent.com/EnergizedProtection/mirror/2d87761a9e47266e7e7b267dc715fc14f67d205b/converter/filter/easyprivacy.txt https://raw.githubusercontent.com/shff/hosts/master/hosts) | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/  / /' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
+alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\" https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt https://raw.githubusercontent.com/shff/hosts/master/hosts https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/facebook/all-but-whatsapp) | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/  / /' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
 alias wback='wget -np -e robots=off --mirror --domains=staticweb.archive.org,web.archive.org '
 alias wg='wget --recursive --page-requisites --convert-links --adjust-extension --no-clobber --random-wait -e robots=off -U mozilla '
 alias wgmp3='wget -r --accept "*.mp3" -nd --level 2'
@@ -58,13 +55,13 @@ alias e='env $(cat .env | xargs) '
 alias l='ls -lah'
 alias f='find . -name'
 alias ya='youtube-dl -x --audio-format wav '
-alias ya3='youtube-dl -x --audio-format mp3 '
+alias ya3='youtube-dl -o "%(playlist_index)s - %(title)s.%(ext)s" -x --audio-format mp3 '
 alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d' ' -f2-"
 alias specs="be rspec \$(git diff --name-only master.. spec/ | grep _spec)"
 alias remigrate="git diff --name-only master.. db/migrate | tail -r | cut -d'/' -f3- | cut -d'_' -f1 | xargs -n1 -I {} env \$(cat .env | xargs) bin/rails db:migrate:down VERSION={} ;  env \$(cat .env | xargs) bin/rails db:migrate"
 
 # Map Reduce
-alias map='xargs -n1 -I $'
+alias map='xargs -L 1 -I $'
 alias count="sort | uniq -c | sort"
 filter() { while read it; do if $(eval $1); then echo $it; fi; done }     # Example: `ls | filter '[ "$l" = "Desktop" ]'`
 
@@ -77,7 +74,7 @@ alias gau='git add --update'
 alias gb='git branch'
 alias gbd='git branch --delete '
 alias gc='git commit'
-alias gca='git commit --amend'
+alias gca='git commit --amend --no-edit'
 alias gcm='git commit --message'
 alias gcf='git commit --fixup'
 alias gco='git checkout'
@@ -97,11 +94,13 @@ alias gmc='git merge --continue'
 alias gp='git pull'
 alias gpr='git pull --rebase'
 alias gprom='git pull --rebase origin master'
-alias gprop='git pull --rebase origin develop'
+alias gprom='git pull --rebase origin develop'
 alias gr='git rebase'
 alias grim='git rebase -i origin/master'
 alias grid='git rebase -i origin/develop'
+alias grir='git rebase -i --root'
 alias gra='git rebase --abort'
+alias grc='git rebase --continue'
 alias gs='git status'
 alias gss='git status --short'
 alias gst='git stash'
@@ -112,6 +111,8 @@ alias gstp='git stash pop'
 alias gsts='git stash save'
 alias gsui='git submodule update --init'
 alias gwip='git commit -am "[WIP]"'
+alias gfmm='git fetch origin master:master'
+alias gbb='git checkout $(git branch | grep -v \* | fzf --height=10 --info=hidden)'
 
 g() {
   grep -R $1 .
@@ -138,7 +139,7 @@ merge_audio()
 
 set_track_numbers()
 {
-  ls *.mp3 | sed 's/^\(\([0-9][0-9] \)\(.*\).mp3\)$/eyeD3 -n \2 -t "\3" "\1"/' | sh
+  ls *.mp3 | sed 's/^\(\([0-9]* \)\(.*\).mp3\)$/eyeD3 -n \2 -t "\3" "\1"/' | sh
 }
 
 rhyme()
@@ -228,20 +229,24 @@ cleanup()
 
   echo ' - Yarn Cache'
   yarn cache clean > /dev/null
+  rm -f ~/.yarnrc
 
   echo ' - NPM Cache and Logs'
   rm -rf ~/.npm
   rm -f ~/.node_repl_history
   rm -f ~/.config/configstore/update-notifier-npm.json
+  rm -f ~/.npmrc
+  rm -f ~/.config/configstore/nodemon.json
+  rm -f ~/.config/configstore/update-notifier-nodemon.json
 
   echo ' - Cargo Cache'
   rm -rf ~/.cargo/registry
   rm -rf ~/.cargo/git
 
   echo ' - Language temp files'
-  rm ~/.v8flags*
-  rm ~/.babel.json
-  rm ~/.python_history
+  rm ~/.v8flags* 2> /dev/null
+  rm ~/.babel.json 2> /dev/null
+  rm ~/.python_history 2> /dev/null
 
   echo ' - Browser data'
   rm -rf ~/Library/Safari/LocalStorage/http*
@@ -256,7 +261,7 @@ cleanup()
   # rm -rf ~/Library/Cookies/Cookies.binarycookies
 
   echo ' - Local caches'
-  rm -r ~/.cache
+  rm -r ~/.cache 2> /dev/null
   find ~/Library/Caches/ -not -name AudioUnitCache -not -name com.apple.audiounits.cache -delete 2> /dev/null
   find ~/Library/Containers/ -name 'Caches' 2> /dev/null | xargs rm -rf
 
@@ -292,6 +297,7 @@ cleanup()
   echo ' - Remove empty folders'
   sudo find ~/ -name .DS_Store -delete 2> /dev/null
   sudo find ~/Library -depth -empty -delete 2> /dev/null
+  rm -r .config
 
   echo ' - Clean trash on all volumes'
   sudo rm -rf ~/.Trash/*
@@ -336,11 +342,22 @@ cleanup()
   sudo purge
 }
 
-(find ~/ -name .DS_Store -delete &>/dev/null &)
+de() {
+  curl -s "https://api.mymemory.translated.net/get?q=$1&langpair=de|en" | jq -r '.responseData.translatedText'
+}
+
+de2() {
+  curl -s "https://api.mymemory.translated.net/get?q=$1&langpair=en|de" | jq -r '.responseData.translatedText'
+}
+
+article() {
+  BASE_URL=https://dictionary.yandex.net/api/v1/dicservice.json
+  API_KEY=dict.1.1.20210203T215939Z.2821615ab5902e4c.a85334d1d0b70dba519445e6b36f1198d0d7e811
+  curl "$BASE_URL/lookup?key=$API_KEY&lang=de-en&text=$1" | jq -r '.def[0].gen' | sed 's/f/die/; s/m/der/; s/n/das/'
+}
 
 # Node
 export NODE_PATH=/usr/local/lib/node_modules
-export TZ=Brazil
 
 # Rust
 export PATH=~/.cargo/bin:${PATH}
@@ -349,7 +366,11 @@ export PATH=~/.cargo/bin:${PATH}
 [ -x "$(command -v rbenv)" ] && (rbenv rehash &)
 export PATH="~/.rbenv/shims:${PATH}"
 
-(find ~/ -name .DS_Store -delete &>/dev/null &)
-
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
+
+echo 🔴 $(cat ~/.german.txt | grep "? " | cut -c3- | sort -R | head -n1)
+echo 🌕 $(cat ~/.german.txt | grep "! " | cut -c3- | sort -R | head -n1)
+echo 🎾 $(cat ~/.german.txt | grep "# " | cut -c3- | cut -d, -f1 | sort -R | head -n1)
+
+(find ~/ -name .DS_Store -delete &>/dev/null &)
