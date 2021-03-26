@@ -363,8 +363,10 @@ export PATH="~/.rbenv/shims:${PATH}"
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 
-echo 🔴 $(cat ~/.german.txt | grep "? " | cut -c3- | sort -R | head -n1)
-echo 🌕 $(cat ~/.german.txt | grep "! " | cut -c3- | sort -R | head -n1)
-echo 🎾 $(cat ~/.german.txt | grep "# " | cut -c3- | cut -d, -f1 | sort -R | head -n1)
+if [ -f ~/.german.txt ]; then
+  echo 🔴 $(cat ~/.german.txt | grep "? " | cut -c3- | sort -R | head -n1)
+  echo 🌕 $(cat ~/.german.txt | grep "! " | cut -c3- | sort -R | head -n1)
+  echo 🎾 $(cat ~/.german.txt | grep "# " | cut -c3- | cut -d, -f1 | sort -R | head -n1)
+fi
 
 (find ~/ -name .DS_Store -delete &>/dev/null &)
