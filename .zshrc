@@ -218,20 +218,23 @@ cleanup()
 {
   echo 'Cleaning up...'
 
-  echo ' - Bash History'
+  echo ' - Shell History'
   rm -rf ~/.bash_history
+  rm -rf ~/.zsh_history
 
-  echo ' - Bash Sessions'
+  echo ' - Shell Sessions'
   rm -rf ~/.bash_sessions
+  rm -rf ~/.zsh_sessions
 
   echo ' - Gem Cache'
   gem cleanup > /dev/null
 
   echo ' - Yarn Cache'
-  yarn cache clean > /dev/null
+  [ -x "$(command -v yarn)" ] && yarn cache clean > /dev/null
   rm -f ~/.yarnrc
 
   echo ' - NPM Cache and Logs'
+  [ -x "$(command -v npm)" ] && npm cache clean --force > /dev/null
   rm -rf ~/.npm
   rm -f ~/.node_repl_history
   rm -f ~/.config/configstore/update-notifier-npm.json
