@@ -34,7 +34,7 @@ git config --global format.pretty "format:%Cred%h%Creset %s %Cgreen(%cr) %C(yell
 [ -x "$(command -v diff-so-fancy)" ] && git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
 
 alias urls="perl -pe 's|.*(https?:\/\/.*?)\".*|\1|'"
-alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl https://www.malwaredomainlist.com/hostslist/hosts.txt http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\" https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt https://raw.githubusercontent.com/shff/hosts/master/hosts https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/facebook/all-but-whatsapp) | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/  / /' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | grep "0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
+alias hostmaker="( head -n 20 /etc/hosts ; printf \"\\n\\n\\n\" ; (curl http://winhelp2002.mvps.org/hosts.txt https://someonewhocares.org/hosts/zero/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts \"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext\" https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/facebook/all-but-whatsapp https://raw.githubusercontent.com/notracking/hosts-blocklists/master/hostnames.txt https://raw.githubusercontent.com/shff/hosts/master/hosts) | sed -e 's/127.0.0.1/0.0.0.0/' -e 's/  / /' -e 's/ \+/ /' -e 's/#.*$//' | tr -d '\r' | awk '{gsub(/\t+/,\" \");print}' | egrep "^0.0.0.0" | grep -v \"thepiratebay.\" | sort -fu | uniq -i ) > ~/.hosts; sudo cp ~/.hosts /etc/hosts; rm ~/.hosts"
 alias wback='wget -np -e robots=off --mirror --domains=staticweb.archive.org,web.archive.org '
 alias wg='wget --recursive --page-requisites --convert-links --adjust-extension --no-clobber --random-wait -e robots=off -U mozilla '
 alias wgmp3='wget -r --accept "*.mp3" -nd --level 2'
@@ -48,17 +48,12 @@ alias shn_to_mp3="find . -name \"*.shn\" -exec ffmpeg -i \"{}\" -acodec mp3 -b:a
 alias ogg_to_mp3="find . -name \"*.ogg\" -exec ffmpeg -i \"{}\" -acodec mp3 -b:a 320k \"{}.mp3\" \\;"
 alias add_cover_art="eyeD3 --add-image cover.jpg:FRONT_COVER *.mp3"
 alias chwat="stat -f \"%OLp\""
-alias s="/Applications/Instalados/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
-alias be='env $(cat .env | xargs) bundle exec'
-alias r='env $(cat .env | xargs) bin/rails'
-alias e='env $(cat .env | xargs) '
+alias s="code"
 alias l='ls -lah'
 alias f='find . -name'
 alias ya='youtube-dl -x --audio-format wav '
 alias ya3='youtube-dl -o "%(playlist_index)s - %(title)s.%(ext)s" -x --audio-format mp3 '
 alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d' ' -f2-"
-alias specs="be rspec \$(git diff --name-only master.. spec/ | grep _spec)"
-alias remigrate="git diff --name-only master.. db/migrate | tail -r | cut -d'/' -f3- | cut -d'_' -f1 | xargs -n1 -I {} env \$(cat .env | xargs) bin/rails db:migrate:down VERSION={} ;  env \$(cat .env | xargs) bin/rails db:migrate"
 
 # Map Reduce
 alias map='xargs -L 1 -I $'
@@ -113,6 +108,7 @@ alias gsui='git submodule update --init'
 alias gwip='git commit -am "[WIP]"'
 alias gfmm='git fetch origin master:master'
 alias gbb='git checkout $(git branch | grep -v \* | fzf --height=10 --info=hidden)'
+alias gfdev='git fetch origin develop:develop'
 
 g() {
   grep -R $1 .
@@ -142,78 +138,6 @@ set_track_numbers()
   ls *.mp3 | sed 's/^\(\([0-9]* \)\(.*\).mp3\)$/eyeD3 -n \2 -t "\3" "\1"/' | sh
 }
 
-rhyme()
-{
-  curl -s "http://rhymebrain.com/talk?function=getRhymes&word=$1" | jq -r '.[] | select(.score == 300) | .word' | sort | column
-}
-
-cep()
-{
-  curl -s "https://viacep.com.br/ws/$(echo $1 | tr -dc '0-9')/json/" | jq -r '.logradouro, .bairro, .localidade, .uf'
-}
-
-getsub() {
-  curl -H "User-Agent: SubDB/1.0 (One-line Bash script)" "http://api.thesubdb.com/?action=download&language=en%2Cpt&hash=$((head -c 65536 "$1"; tail -c 65536 "$1") | md5)" > "${1%%.*}.srt"
-}
-
-mono_bundler()
-{
-  NAME=$(basename "$1");
-  CC="gcc -lobjc -liconv -framework CoreFoundation" mkbundle -o ${NAME%.exe} --deps --static -z $1
-}
-
-rebase()
-{
-  git checkout $1
-  git pull --rebase origin master
-  git rebase --abort
-  git push -f
-  git checkout -
-}
-
-restore_db() {
-  database=$1 psql <<EOF
-SELECT PG_TERMINATE_BACKEND(pid) FROM pg_stat_activity WHERE pid <> PG_BACKEND_PID() AND datname = '$database';
-DROP DATABASE IF EXISTS "$database";
-CREATE DATABASE "$database";
-EOF
-
-  pg_restore -d $1 --no-acl --no-owner $2
-}
-
-simulator() {
-  TMP_APP_DIR=$TMPDIR/tmp_app
-  APP_DIR=$TMP_APP_DIR/Application.app
-  PLIST_PATH=$APP_DIR/Info.plist
-
-  rm -r $TMP_APP_DIR
-  mkdir $TMP_APP_DIR
-  mkdir $APP_DIR
-  cp $1 $APP_DIR/main
-
-  echo '<plist><dict /></plist>' > $PLIST_PATH
-  plutil -insert CFBundleDevelopmentRegion -string "en" $PLIST_PATH
-  plutil -insert CFBundleDisplayName -string "Temp App" $PLIST_PATH
-  plutil -insert CFBundleExecutable -string "main" $PLIST_PATH
-  plutil -insert CFBundleIdentifier -string "io.github.shff.TempApp" $PLIST_PATH
-  plutil -insert CFBundleInfoDictionaryVersion -string "6.0" $PLIST_PATH
-  plutil -insert CFBundleName -string "Temp App" $PLIST_PATH
-  plutil -insert CFBundlePackageType -string "APPL" $PLIST_PATH
-  plutil -insert CFBundleShortVersionString -string "1.0.0" $PLIST_PATH
-  plutil -insert CFBundleSignature -string "????" $PLIST_PATH
-  plutil -insert CFBundleVersion -string "1" $PLIST_PATH
-  plutil -insert LSRequiresIPhoneOS -bool "true" $PLIST_PATH
-  plutil -insert UISupportedInterfaceOrientations -xml '<array/>' $PLIST_PATH
-  plutil -insert UISupportedInterfaceOrientations.0 -string UIInterfaceOrientationPortrait $PLIST_PATH
-  plutil -insert UISupportedInterfaceOrientations.1 -string UIInterfaceOrientationPortraitUpsideDown $PLIST_PATH
-  plutil -insert UISupportedInterfaceOrientations.2 -string UIInterfaceOrientationLandscapeLeft $PLIST_PATH
-  plutil -insert UISupportedInterfaceOrientations.3 -string UIInterfaceOrientationLandscapeRight $PLIST_PATH
-
-  SIMULATOR=$(xcrun simctl list --json | jq -r '[ .devices | values[] ] | flatten[] | select(.state == "Booted") | .name' | fzf -1)
-  xcrun simctl install $SIMULATOR "$APP_DIR"
-  xcrun simctl launch $SIMULATOR "io.github.shff.TempApp"
-}
-
 cleanup()
 {
   echo 'Cleaning up...'
@@ -227,14 +151,14 @@ cleanup()
   rm -rf ~/.zsh_sessions
 
   echo ' - Gem Cache'
-  gem cleanup > /dev/null
+  [ -x "$(command -v gem)" ] && gem cleanup > /dev/null
 
   echo ' - Yarn Cache'
   [ -x "$(command -v yarn)" ] && yarn cache clean > /dev/null
   rm -f ~/.yarnrc
 
   echo ' - NPM Cache and Logs'
-  [ -x "$(command -v npm)" ] && npm cache clean --force > /dev/null
+  [ -x "$(command -v gem)" ] && npm cache clean --force &>/dev/null
   rm -rf ~/.npm
   rm -f ~/.node_repl_history
   rm -f ~/.config/configstore/update-notifier-npm.json
@@ -245,6 +169,13 @@ cleanup()
   echo ' - Cargo Cache'
   rm -rf ~/.cargo/registry
   rm -rf ~/.cargo/git
+
+  echo ' - Docker Cache'
+  [ -x "$(command -v docker)" ] && docker system prune -af &>/dev/null
+
+  echo ' - Homebrew Cache'
+  [ -x "$(command -v brew)" ] && brew cleanup -s &>/dev/null
+  [ -x "$(command -v brew)" ] && rm -rfv "$(brew --cache)"
 
   echo ' - Language temp files'
   rm ~/.v8flags* 2> /dev/null
@@ -258,6 +189,7 @@ cleanup()
   rm -rf ~/Library/Google
   rm -rf ~/Library/Application\ Support/Firefox
   rm -rf ~/Library/Application\ Support/Google
+  rm -rf ~/Library/Application\ Support/TorBrowser-Data
   rm -rf ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2*
   # rm -rf ~/Library/Safari/History*
   # rm -rf ~/Library/Cookies/com.apple.Safari.cookies
@@ -285,6 +217,24 @@ cleanup()
   rm -rf /Library/Caches/Homebrew/
   rm -rf ~/Library/Caches/Homebrew/
 
+  echo ' - VSCode Caches'
+  rm -rf ~/Library/Application\ Support/Code/CachedData
+  rm -rf ~/Library/Application\ Support/Code/CrashpadMetrics-active.pma
+  rm -rf ~/Library/Application\ Support/Code/CrashpadMetrics.pma
+  rm -rf ~/Library/Application\ Support/Code/GPUCache
+  rm -rf ~/Library/Application\ Support/Code/CachedExtensions
+  rm -rf ~/Library/Application\ Support/Code/Cache
+  rm -rf ~/Library/Application\ Support/Code/logs
+  rm -rf ~/Library/Application\ Support/Code/Backups
+  rm -rf ~/Library/Application\ Support/Code/Code\ Cache
+  rm -rf ~/Library/Application\ Support/Code/Crashpad
+
+  echo ' - Adobe Cache'
+  rm -rf ~/Library/Application\ Support/Adobe/Common/Media\ Cache\ Files/
+
+  echo ' - Native Instruments Cache'
+  rm -rf ~/Library/Application\ Support/Native\ Instruments/Kontakt/LibrariesCache
+
   echo ' - Local logs'
   rm -rf ~/Library/Logs/
   rm -rf ~/Library/Logs/CoreSimulator/
@@ -298,44 +248,38 @@ cleanup()
   rm -rf ~/Library/Application\ Support/CrashReporter
 
   echo ' - Remove empty folders'
-  sudo find ~/ -name .DS_Store -delete 2> /dev/null
-  sudo find ~/Library -depth -empty -delete 2> /dev/null
-  rm -r .config
+  find ~/ -name .DS_Store -delete 2> /dev/null
+  find ~/Library -depth -empty -delete 2> /dev/null
+  rm -rf ~/.config
 
-  echo ' - Clean trash on all volumes'
-  sudo rm -rf ~/.Trash/*
+  # echo ' - System Log Files'
+  # sudo rm -rf /Library/Logs/DiagnosticReports/*
+  # sudo rm -rf /Library/Logs/CrashReporter/*
+  # sudo rm -rf /Library/Logs/Adobe/*
+  # sudo rm -rf /var/log/asl/*.asl
+  # sudo rm -rf /var/log/wifi.log*
+  # sudo rm -rf /var/log/system.log*
+  # sudo rm -rf /var/log/install.log*
+  # sudo rm -rf /var/log/*.out
+  # sudo rm -rf /var/log/fsck*
 
-  echo ' - System Log Files'
-  sudo rm -rf /Library/Logs/DiagnosticReports/*
-  sudo rm -rf /Library/Logs/CrashReporter/*
-  sudo rm -rf /Library/Logs/Adobe/*
-  sudo rm -rf /var/log/asl/*.asl
-  sudo rm -rf /var/log/wifi.log*
-  sudo rm -rf /var/log/system.log*
-  sudo rm -rf /var/log/install.log*
-  sudo rm -rf /var/log/*.out
-  sudo rm -rf /var/log/fsck*
+  # echo ' - Shared user data'
+  # sudo rm -rf /Users/Shared/* &> /dev/null
 
-  echo ' - Shared user data'
-  sudo rm -rf /Users/Shared/* &> /dev/null
-
-  echo ' - System Caches'
-  sudo rm -rf /Library/Caches/*
+  # echo ' - System Caches'
+  # sudo rm -rf /Library/Caches/*
   # sudo rm -rf /System/Library/Caches/* &> /dev/null
 
-  echo ' - System diagnostics'
-  sudo rm -rf /var/db/diagnostics/*
-  sudo rm -rf /private/var/log/DiagnosticMessages/*
+  # echo ' - System diagnostics'
+  # sudo rm -rf /var/db/diagnostics/*
+  # sudo rm -rf /private/var/log/DiagnosticMessages/*
 
-  echo ' - Adobe Cache Files'
-  sudo rm -rf ~/Library/Application\ Support/Adobe/Common/Media\ Cache\ Files/*
+  # echo ' - User temp and cache dirs'
+  # find $(getconf DARWIN_USER_CACHE_DIR) -delete
+  # find $(getconf DARWIN_USER_TEMP_DIR) -delete
 
   echo ' - Run periodic scripts'
   sudo periodic daily weekly monthly
-
-  echo ' - User temp and cache dirs'
-  # find $(getconf DARWIN_USER_CACHE_DIR) -delete
-  # find $(getconf DARWIN_USER_TEMP_DIR) -delete
 
   echo ' - Clear DNS Cache'
   sudo killall -HUP mDNSResponder
@@ -345,31 +289,8 @@ cleanup()
   sudo purge
 }
 
-de() {
-  curl -s "https://api.mymemory.translated.net/get?q=$1&langpair=de|en" | jq -r '.responseData.translatedText'
-}
-
-de2() {
-  curl -s "https://api.mymemory.translated.net/get?q=$1&langpair=en|de" | jq -r '.responseData.translatedText'
-}
-
 # Node
 export NODE_PATH=/usr/local/lib/node_modules
 
-# Rust
-export PATH=~/.cargo/bin:${PATH}
-
-# rbenv
-[ -x "$(command -v rbenv)" ] && (rbenv rehash &)
-export PATH="~/.rbenv/shims:${PATH}"
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-
-if [ -f ~/.german.txt ]; then
-  echo 🔴 $(cat ~/.german.txt | grep "? " | cut -c3- | sort -R | head -n1)
-  echo 🌕 $(cat ~/.german.txt | grep "! " | cut -c3- | sort -R | head -n1)
-  echo 🎾 $(cat ~/.german.txt | grep "# " | cut -c3- | cut -d, -f1 | sort -R | head -n1)
-fi
-
-(find ~/ -name .DS_Store -delete &>/dev/null &)
+# Rust, RVM, RBENV, DotNet and Deno
+export PATH=~/.cargo/bin:~/.rvm/bin:~/.dotnet:~/.deno:~/.rbenv/shims:${PATH}
