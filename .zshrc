@@ -138,6 +138,25 @@ set_track_numbers()
   ls *.mp3 | sed 's/^\(\([0-9]* \)\(.*\).mp3\)$/eyeD3 -n \2 -t "\3" "\1"/' | sh
 }
 
+pkg_util() {
+  local options=( $(pkgutil --pkgs | grep -v com.apple | sort | xargs -n 1) )
+  select opt in "${options[@]}" "Quit"; do
+    local name=$options[$REPLY]
+    local volume=$(pkgutil --pkg-info $name | grep volume | sed -e 's/volume: //')
+    local location=$(pkgutil --pkg-info $name | grep location | sed -e 's/location: //')
+    local dirs=$(pkgutil --only-files --files $name | while read line; do echo "$volume$location/$line"; done)
+    local dirs_that_exist=$(echo $dirs | sed -e 's/ /\\ /g' | xargs ls 2>/dev/null | wc -l)
+
+    if [ $dirs_that_exist -eq 0 ]; then
+      echo "The package has no files. Forgetting..."
+      sudo pkgutil --forget $name
+    else
+      echo "The package is in use. Directories:"
+      echo $dirs
+    fi
+  done
+}
+
 cleanup()
 {
   echo 'Cleaning up...'
