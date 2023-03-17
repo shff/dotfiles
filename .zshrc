@@ -53,6 +53,7 @@ alias l='ls -lah'
 alias f='find . -name'
 alias ya='youtube-dl -x --audio-format wav '
 alias ya3='youtube-dl -o "%(playlist_index)s - %(title)s.%(ext)s" -x --audio-format mp3 '
+alias yaw='youtube-dl -o "%(playlist_index)s - %(title)s.%(ext)s" -x --audio-format wav '
 alias sort-by-length="awk '{ print length, $0 }' | sort -n -s --reverse | cut -d' ' -f2-"
 
 # Map Reduce
@@ -154,6 +155,17 @@ pkg_util() {
       echo "The package is in use. Directories:"
       echo $dirs
     fi
+  done
+}
+
+unity_package_extract()
+{
+  # traverse all directories, ONLY DIRECTORIES
+  for dir in $(find . -type d); do
+    PATHNAME=$(cat $dir/pathname | head -n1)
+    DIRNAME=$(dirname $PATHNAME)
+    mkdir -p $DIRNAME
+    cp $dir/asset $PATHNAME
   done
 }
 
