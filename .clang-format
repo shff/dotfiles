@@ -1,10 +1,13 @@
-BasedOnStyle: llvm
-BreakBeforeBraces: Allman
+ColumnLimit: 120
+# BasedOnStyle: llvm
+# BreakBeforeBraces: Allman
 KeepEmptyLinesAtTheStartOfBlocks: false
-AllowShortCaseLabelsOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: false
 AllowShortBlocksOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 NamespaceIndentation: All
 IndentCaseLabels: true
+InsertBraces: true
+AllowShortCaseExpressionOnASingleLine: false
