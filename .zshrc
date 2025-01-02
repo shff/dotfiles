@@ -24,7 +24,7 @@ export HISTCONTROL="erasedups:ignoreboth"
 set -o noclobber
 
 git config --global user.name "Silvio Henrique Ferreira"
-git config --global user.email "shferreira@me.com"
+git config --global user.email "25377830+shff@users.noreply.github.com"
 git config --global core.excludesfile '~/.gitignore'
 git config --global --replace alias.l 'log'
 git config --global --replace alias.s 'show'
